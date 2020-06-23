@@ -1,0 +1,66 @@
+name: Jekyll site CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the site in the jekyll/builder container
+      run: |
+        docker run \
+        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+        jekyll/builder:latest /bin/bash -c "chmod 777 /srv/jekyll && jekyll build --future"
+- name: Cache
+  uses: actions/cache@v2.0.0
+  with:
+    # A list of files, directories, and wildcard patterns to cache and restore
+    path: 
+    # An explicit key for restoring and saving the cache
+    key: 
+    # An ordered list of keys to use for restoring the cache if no cache hit occurred for key
+    restore-keys: # optional
+    - name: Cachix
+  uses: cachix/cachix-action@v6
+  with:
+    # Name of a cachix cache to push and pull/substitute
+    name: 
+    # Authentication token for Cachix, needed only for private cache access
+    authToken: # optional
+    # Signing key secret retrieved after creating binary cache on https://cachix.org
+    signingKey: # optional
+    # Set to true to disable pushing build results to the cache
+    skipPush: # optional
+    - name: Always-Cache
+  uses: gerbal/always-cache@v1.0.3
+  with:
+    # A directory to store and save the cache
+    path: 
+    # An explicit key for restoring and saving the cache
+    key: 
+    # An ordered list of keys to use for restoring the cache if no cache hit occurred for key
+    restore-keys: # optional
+    - name: cachepurger
+  uses: CyrusRoshan/cachepurger@v1.0
+  with:
+    # URL that hosts published files
+    url-prefix: 
+    # Cloudflare Zone ID
+    zone-id: 
+    # Scoped Cloudflare API Token. Either use this, or API Key + Email
+    api-token: # optional
+    # Cloudflare Global API Key
+    api-key: # optional
+    # Cloudflare Email
+    email: # optional
+    # 
+    from-commit: # optional, default is ${{ github.event.before }}
+    # 
+    to-commit: # optional, default is ${{ github.sha }}
